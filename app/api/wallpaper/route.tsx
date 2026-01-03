@@ -5,11 +5,8 @@
 
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
-import {
-  calculateDaysLeftInYear,
-  getCurrentDayOfYear,
-  getTotalDaysInCurrentYear,
-} from '@/lib/calcs';
+import { YearView } from './year-view';
+import { LifeView } from './life-view';
 
 export const runtime = 'edge';
 
@@ -18,197 +15,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const width = parseInt(searchParams.get('width') || '1170');
     const height = parseInt(searchParams.get('height') || '2532');
+    const viewMode = searchParams.get('viewMode') || 'year';
+    const birthDate = searchParams.get('birthDate') || '';
 
-    // Colors Config (User Requested)
-    const BG_COLOR = '#1a1a1a'; // Dark, almost brown/grey mix
-    const TEXT_COLOR = '#888888'; // Grey for months and percent
-    const PAST_COLOR = '#FFFFFF'; // White for passed days
-    const ACCENT_COLOR = '#FF6B35'; // Orange for current day and "days left" text
-    const FUTURE_COLOR = '#404040'; // Darker grey for future dots
+    let content;
 
-    // Year Logic
-    const date = new Date();
-    const currentYear = date.getFullYear();
-    const currentDayOfYear = getCurrentDayOfYear();
-    const daysLeft = calculateDaysLeftInYear();
-    const totalDays = getTotalDaysInCurrentYear();
-
-    // Grid Layout Config
-    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const COLUMNS = 3; // 3 Months per row
-    const ROWS = 4;    // 4 Rows of months
-
-    // --- Layout Calculations ---
-
-    // 1. Safe Zones (User requested "whole calendar a little down because it's too high")
-    // Increased Top Safe Zone from 15% to 25% to push content down
-    const SAFE_AREA_TOP = height * 0.25;
-    const SAFE_AREA_BOTTOM = height * 0.15; // Slightly reduced bottom to keep balance
-    const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
-
-    // 2. Horizontal Spacing (15% padding)
-    const paddingX = width * 0.18;
-    const availableWidth = width - (paddingX * 2);
-    const cellWidth = availableWidth / COLUMNS;
-
-    // 3. Size Config 
-    // Increased from /8 to /7, and max size from 16 to 20
-    const dotSize = Math.min(cellWidth / 7, 20);
-    const dotGap = dotSize * 0.7;
-    const monthLabelSize = dotSize * 1.6;
-
-    // 4. Vertical Calculation
-    const monthBlockHeight = monthLabelSize + dotSize + (6 * dotSize) + (5 * dotGap);
-    const rowGap = monthLabelSize * 1.0;
-
-    // Stats Text Config
-    const statsFontSize = monthLabelSize;
-    const statsMargin = rowGap * 4.0;
-
-    const gridHeight = (ROWS * monthBlockHeight) + ((ROWS - 1) * rowGap);
-    const totalContentHeight = gridHeight + statsMargin + statsFontSize;
-
-    // 5. Centering
-    const startY = SAFE_AREA_TOP + ((SAFE_HEIGHT - totalContentHeight) / 2);
-    const statsY = startY + gridHeight + statsMargin;
-
-    // Helper to get days in month
-    const getDaysInMonth = (year: number, monthIndex: number) => {
-      return new Date(year, monthIndex + 1, 0).getDate();
-    };
-
-    const getFirstDayOfMonth = (year: number, monthIndex: number) => {
-      return new Date(year, monthIndex, 1).getDay(); // 0 = Sun, etc.
-    };
-
-    let globalDayCounter = 0;
-
-    // Build the grid
-    const monthCells = MONTHS.map((monthName, monthIndex) => {
-      const daysInMonth = getDaysInMonth(currentYear, monthIndex);
-      const startDay = getFirstDayOfMonth(currentYear, monthIndex); // 0-6
-
-      const dots = [];
-
-      // We render a 7x6 grid (max needed for any month)
-      for (let i = 0; i < 42; i++) {
-        const dayNum = i - startDay + 1;
-
-        let color = 'transparent';
-
-        if (dayNum > 0 && dayNum <= daysInMonth) {
-          globalDayCounter++;
-
-          if (globalDayCounter < currentDayOfYear) {
-            color = PAST_COLOR; // White
-          } else if (globalDayCounter === currentDayOfYear) {
-            color = ACCENT_COLOR; // Orange
-          } else {
-            color = FUTURE_COLOR;
-          }
-        }
-
-        if (dayNum > 0 && dayNum <= daysInMonth) {
-          const row = Math.floor(i / 7);
-          const col = i % 7;
-
-          dots.push(
-            <div
-              key={`dot-${monthIndex}-${i}`}
-              style={{
-                position: 'absolute',
-                left: col * (dotSize + dotGap),
-                top: row * (dotSize + dotGap),
-                width: dotSize,
-                height: dotSize,
-                borderRadius: '50%',
-                backgroundColor: color,
-              }}
-            />
-          );
-        }
-      }
-
-      // Calculate position of this month cell
-      const colIndex = monthIndex % COLUMNS;
-      const rowIndex = Math.floor(monthIndex / COLUMNS);
-
-      const x = paddingX + (colIndex * cellWidth);
-      const y = startY + (rowIndex * (monthBlockHeight + rowGap));
-
-      return (
-        <div
-          key={monthName}
-          style={{
-            position: 'absolute',
-            left: x + (cellWidth - (7 * (dotSize + dotGap))) / 2, // Center in cell
-            top: y,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {/* Month Label */}
-          <div style={{
-            color: TEXT_COLOR,
-            fontSize: monthLabelSize,
-            marginBottom: dotSize,
-            fontFamily: 'monospace',
-            display: 'flex'
-          }}>
-            {monthName}
-          </div>
-
-          {/* Calendar Grid */}
-          <div style={{ position: 'relative', width: 7 * (dotSize + dotGap), height: 6 * (dotSize + dotGap), display: 'flex' }}>
-            {dots}
-          </div>
-        </div>
-      );
-    });
+    if (viewMode === 'life' && birthDate) {
+      content = <LifeView width={width} height={height} birthDate={birthDate} />;
+    } else {
+      // Default to Year View
+      content = <YearView width={width} height={height} />;
+    }
 
     return new ImageResponse(
-      (
-        <div
-          style={{
-            width: '100%',
-            height: '100%',
-            backgroundColor: BG_COLOR,
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'relative',
-          }}
-        >
-          {/* Grid of Months */}
-          <div style={{ display: 'flex', position: 'relative', width: '100%', height: '100%' }}>
-            {monthCells}
-          </div>
-
-          {/* Footer Stats - SWAPPED COLORS HERE */}
-          <div
-            style={{
-              position: 'absolute',
-              top: statsY,
-              left: 0,
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              fontSize: statsFontSize,
-              fontFamily: 'monospace',
-              // letterSpacing removed as requested ("why there are spacing")
-            }}
-          >
-            {/* Days Left -> Orange (ACCENT_COLOR) */}
-            <span style={{ color: ACCENT_COLOR }}>{daysLeft}d left</span>
-
-            {/* Separator -> Grey/Text Color (User: "dot ... dosn't need to be orange") */}
-            <span style={{ color: TEXT_COLOR, margin: '0 8px' }}>·</span>
-
-            {/* Percent -> Grey (TEXT_COLOR) */}
-            <span style={{ color: TEXT_COLOR }}>{Math.round((currentDayOfYear / totalDays) * 100)}%</span>
-          </div>
-        </div>
-      ),
+      content,
       {
         width,
         height,

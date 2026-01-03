@@ -29,10 +29,10 @@ export default function Home() {
         const profile: UserProfile = JSON.parse(savedProfile);
         setBirthDate(profile.birthDate);
         if (profile.viewMode) setViewMode(profile.viewMode);
-        
+
         if (profile.device) {
           setSelectedDevice({
-            brand: '', 
+            brand: '',
             model: profile.device.modelName,
             width: profile.device.width,
             height: profile.device.height,
@@ -75,10 +75,10 @@ export default function Home() {
       params.append('birthDate', birthDate);
     }
 
-    const baseUrl = typeof window !== 'undefined' 
+    const baseUrl = typeof window !== 'undefined'
       ? `${window.location.protocol}//${window.location.host}`
       : '';
-    
+
     const url = `${baseUrl}/api/wallpaper?${params.toString()}`;
     setWallpaperUrl(url);
   };
@@ -112,7 +112,7 @@ export default function Home() {
             {viewMode === 'life' && (
               <BirthDateInput value={birthDate} onChange={setBirthDate} />
             )}
-            
+
             <DeviceSelector
               selectedModel={selectedDevice?.model || ''}
               onSelect={setSelectedDevice}
@@ -148,7 +148,7 @@ export default function Home() {
                 {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
-            
+
             <div className="text-center">
               <a
                 href={wallpaperUrl}
@@ -159,7 +159,7 @@ export default function Home() {
                 Preview Wallpaper
               </a>
             </div>
-            
+
             <SetupInstructions wallpaperUrl={wallpaperUrl} />
           </div>
         )}

@@ -70,34 +70,25 @@ export function LifeView({ width, height, birthDate }: LifeViewProps) {
     const startX = (width - gridWidth) / 2;
     const startY = SAFE_AREA_TOP + (availableHeight - gridHeight) / 2;
 
-    const dots = [];
+    // Generate SVG circles for optimized rendering
+    const pastCircles = [];
+    const futureCircles = [];
+    let currentDotPosition = { x: 0, y: 0 };
 
-    // Render dots
     for (let i = 0; i < TOTAL_DOTS; i++) {
-        let color = FUTURE_COLOR;
-        if (i < weeksLived) {
-            color = PAST_COLOR;
-        } else if (i === weeksLived) {
-            color = CURRENT_COLOR;
-        }
-
         const row = Math.floor(i / cols);
         const col = i % cols;
+        const cx = col * (dotSize + gap) + dotSize / 2;
+        const cy = row * (dotSize + gap) + dotSize / 2;
+        const radius = dotSize / 2;
 
-        dots.push(
-            <div
-                key={i}
-                style={{
-                    position: 'absolute',
-                    left: col * (dotSize + gap),
-                    top: row * (dotSize + gap),
-                    width: dotSize,
-                    height: dotSize,
-                    borderRadius: '50%',
-                    backgroundColor: color,
-                }}
-            />
-        );
+        if (i < weeksLived) {
+            pastCircles.push(<circle key={`past-${i}`} cx={cx} cy={cy} r={radius} fill={PAST_COLOR} />);
+        } else if (i === weeksLived) {
+            currentDotPosition = { cx, cy, radius };
+        } else {
+            futureCircles.push(<circle key={`future-${i}`} cx={cx} cy={cy} r={radius} fill={FUTURE_COLOR} />);
+        }
     }
 
     // Footer Stats
@@ -115,19 +106,30 @@ export function LifeView({ width, height, birthDate }: LifeViewProps) {
                 position: 'relative',
             }}
         >
-            {/* Container for the Grid */}
-            <div
+            {/* Container for the Grid - Using SVG for optimal performance */}
+            <svg
+                width={gridWidth}
+                height={gridHeight}
                 style={{
                     position: 'absolute',
                     left: startX,
                     top: startY,
-                    width: gridWidth,
-                    height: gridHeight,
-                    display: 'flex',
                 }}
             >
-                {dots}
-            </div>
+                {/* Past dots */}
+                {pastCircles}
+
+                {/* Current dot */}
+                <circle 
+                    cx={currentDotPosition.cx} 
+                    cy={currentDotPosition.cy} 
+                    r={currentDotPosition.radius} 
+                    fill={CURRENT_COLOR} 
+                />
+
+                {/* Future dots */}
+                {futureCircles}
+            </svg>
 
             {/* Footer */}
             <div

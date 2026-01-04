@@ -1,11 +1,12 @@
 /**
  * SetupInstructions Component
- * Minimalist Redesign
+ * Minimalist Redesign - Full Screen Modal Version with Portal
  */
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 interface SetupInstructionsProps {
   wallpaperUrl: string;
@@ -13,72 +14,202 @@ interface SetupInstructionsProps {
 }
 
 export default function SetupInstructions({ wallpaperUrl, selectedBrand }: SetupInstructionsProps) {
-  const [openSection, setOpenSection] = useState<'ios' | 'android' | null>(null);
-  
+  const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const isIOS = selectedBrand === 'Apple';
   const isAndroid = selectedBrand !== 'Apple' && selectedBrand !== '';
 
-  const toggleSection = (section: 'ios' | 'android') => {
-    setOpenSection(openSection === section ? null : section);
+  const copyUrl = async () => {
+    try {
+      if (typeof window !== 'undefined' && navigator.clipboard) {
+        await navigator.clipboard.writeText(wallpaperUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        console.warn('Clipboard API not available');
+      }
+    } catch (err) {
+      console.error('Failed to copy', err);
+    }
   };
 
-  return (
-    <div className="w-full max-w-3xl mx-auto pt-8 border-t border-white/10 space-y-6">
-      <h2 className="text-xs font-bold uppercase tracking-widest text-neutral-500 text-center">
-        Automation Setup
-      </h2>
+  if (!mounted) return null;
 
-      <div className="space-y-2">
-        {/* iOS Instructions */}
-        {isIOS && (
-        <div className="border border-white/5 rounded bg-white/5 overflow-hidden">
-          <button
-            onClick={() => toggleSection('ios')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
-          >
-            <span className="text-sm font-medium text-white">iOS Automation</span>
-            <span className="text-neutral-500 text-xs">{openSection === 'ios' ? '−' : '+'}</span>
-          </button>
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 backdrop-blur-md animate-in fade-in duration-300 p-6 md:p-8"
+      onClick={() => setIsOpen(false)}
+    >
 
-          {openSection === 'ios' && (
-            <div className="px-4 py-4 border-t border-white/5 text-sm text-neutral-400 space-y-2">
-              <p>1. Open <strong className="text-white">Shortcuts</strong> app.</p>
-              <p>2. Create new Shortcut with these actions:</p>
-              <ul className="pl-4 list-disc space-y-1 text-neutral-500">
-                <li>Action: <strong className="text-neutral-300">Get Contents of URL</strong> (Paste your generated URL).</li>
-                <li>Action: <strong className="text-neutral-300">Set Wallpaper</strong> (Turn off "Show Preview").</li>
-              </ul>
-              <p>3. Create an Automation to run this shortcut daily at midnight.</p>
+      {/* Close Button - Top Right */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(false);
+        }}
+        className="absolute top-6 right-6 p-2 text-neutral-500 hover:text-white transition-colors z-10"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div
+        className="w-full max-w-lg space-y-8 flex flex-col items-center"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="text-center space-y-3 w-full">
+          <h2 className="text-2xl font-light uppercase tracking-widest text-white">
+            {isIOS ? 'iOS Automation' : isAndroid ? 'Android Automation' : 'Automation Setup'}
+          </h2>
+          <p className="text-neutral-500 text-sm font-light leading-relaxed max-w-sm mx-auto">
+            Follow these steps to enable daily wallpaper updates.
+          </p>
+        </header>
+
+        <div className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[70vh] no-scrollbar">
+
+          {/* iOS Instructions */}
+          {isIOS && (
+            <div className="space-y-8 text-sm text-neutral-400">
+              <div className="flex gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">1</span>
+                <div className="pt-1.5 space-y-2">
+                  <p className="font-medium text-white text-lg">Create Automation</p>
+                  <p className="leading-relaxed">
+                    Open <strong className="text-white">Shortcuts</strong> app → <strong className="text-white">Automation</strong> tab → New Automation.
+                  </p>
+                  <p className="leading-relaxed">
+                    Select <strong className="text-neutral-300">Time of Day</strong> (e.g. 09:00 AM) → Select <strong className="text-white">Run Immediately</strong> (Important).
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">2</span>
+                <div className="pt-1.5 space-y-4 w-full min-w-0">
+                  <p className="font-medium text-white text-lg">Add Actions</p>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider">Action 1</p>
+                    <p className="text-white font-medium">Get Contents of URL</p>
+                    <p>Paste your unique URL:</p>
+                    <div className="relative w-full">
+                      <button
+                        onClick={copyUrl}
+                        className="w-full flex items-center justify-between gap-3 px-3 py-3 bg-black/40 hover:bg-black/60 rounded-lg border border-white/10 transition-colors group overflow-hidden"
+                      >
+                        <span className="text-xs text-neutral-400 group-hover:text-white truncate font-mono flex-1 min-w-0 text-left">
+                          {wallpaperUrl}
+                        </span>
+                        <span className="flex-shrink-0 text-[10px] font-bold text-orange-400 uppercase tracking-wider bg-orange-400/10 px-2 py-1 rounded">
+                          {copied ? 'Copied' : 'Copy'}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-neutral-500 uppercase tracking-wider">Action 2</p>
+                    <p className="text-white font-medium">Set Wallpaper</p>
+                    <div className="bg-orange-500/10 border border-orange-500/20 p-3 rounded-lg">
+                      <p className="text-orange-200 text-xs leading-relaxed">
+                        <strong className="text-orange-400">Important:</strong> Tap the arrow <span className="text-orange-400 opacity-60">{'(>)'}</span> on this action and turn <strong className="text-orange-400">OFF "Show Preview"</strong>.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
-        </div>
-        )}
 
-        {/* Android Instructions */}
-        {isAndroid && (
-        <div className="border border-white/5 rounded bg-white/5 overflow-hidden">
-          <button
-            onClick={() => toggleSection('android')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
-          >
-            <span className="text-sm font-medium text-white">Android Automation</span>
-            <span className="text-neutral-500 text-xs">{openSection === 'android' ? '−' : '+'}</span>
-          </button>
+          {/* Android Instructions */}
+          {isAndroid && (
+            <div className="space-y-8 text-sm text-neutral-400">
+              <div className="flex gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">1</span>
+                <div className="pt-1.5 space-y-2">
+                  <p className="font-medium text-white text-lg">Install MacroDroid</p>
+                  <p>Download <a href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid&hl=en" target="_blank" rel="noopener noreferrer" className="text-white underline decoration-white/30 hover:decoration-white">MacroDroid</a> from the Play Store.</p>
+                </div>
+              </div>
 
-          {openSection === 'android' && (
-            <div className="px-4 py-4 border-t border-white/5 text-sm text-neutral-400 space-y-2">
-              <p>1. Use <a href="https://play.google.com/store/apps/details?id=com.arlosoft.macrodroid&hl=en" target="_blank" rel="noopener noreferrer" className="text-white hover:underline">MacroDroid</a> (or Tasker).</p>
-              <p>2. Create a macro with:</p>
-              <ul className="pl-4 list-disc space-y-1 text-neutral-500">
-                <li>Trigger: <strong className="text-neutral-300">Time of Day</strong> (00:00).</li>
-                <li>Action: <strong className="text-neutral-300">HTTP Request (GET)</strong> to file.</li>
-                <li>Action: <strong className="text-neutral-300">Set Wallpaper</strong> from file.</li>
-              </ul>
+              <div className="flex gap-4">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-medium text-white">2</span>
+                <div className="pt-1.5 space-y-4 w-full min-w-0">
+                  <p className="font-medium text-white text-lg">Create Macro</p>
+
+                  <div className="space-y-3">
+                    <div className="pl-4 border-l border-white/10">
+                      <span className="text-[10px] text-neutral-500 uppercase tracking-wider block mb-1">Trigger</span>
+                      <strong className="text-neutral-200">Time of Day</strong>
+                      <p className="text-xs text-neutral-500 mt-1">Set to 09:00 AM (or preferred time)</p>
+                    </div>
+
+                    <div className="pl-4 border-l border-white/10">
+                      <span className="text-[10px] text-neutral-500 uppercase tracking-wider block mb-1">Action 1</span>
+                      <strong className="text-neutral-200">HTTP Request</strong>
+                      <p className="text-xs text-neutral-500 mt-1 mb-2">Method: GET. Paste URL:</p>
+                      <div className="relative w-full">
+                        <button
+                          onClick={copyUrl}
+                          className="w-full flex items-center justify-between gap-3 px-3 py-2.5 bg-black/40 hover:bg-black/60 rounded-lg border border-white/10 transition-colors group overflow-hidden"
+                        >
+                          <span className="text-xs text-neutral-400 group-hover:text-white truncate font-mono flex-1 min-w-0 text-left">
+                            {wallpaperUrl}
+                          </span>
+                          <span className="flex-shrink-0 text-[10px] font-bold text-orange-400 uppercase tracking-wider bg-orange-400/10 px-2 py-1 rounded">
+                            {copied ? 'Copied' : 'Copy'}
+                          </span>
+                        </button>
+                      </div>
+                      <p className="text-xs text-neutral-500 mt-2">Check "Save response to file".</p>
+                    </div>
+
+                    <div className="pl-4 border-l border-white/10">
+                      <span className="text-[10px] text-neutral-500 uppercase tracking-wider block mb-1">Action 2</span>
+                      <strong className="text-neutral-200">Set Wallpaper</strong>
+                      <p className="text-xs text-neutral-500 mt-1">"Select File" (Choose the file from Action 1).</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
+
+          {!isIOS && !isAndroid && (
+            <div className="text-center text-neutral-400 py-8">
+              <p>Please select a device brand to view specific automation instructions.</p>
+            </div>
+          )}
+
         </div>
-        )}
       </div>
     </div>
+  );
+
+  return (
+    <>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="mx-auto flex items-center justify-center gap-2 px-6 py-3 text-neutral-500 hover:text-white transition-all duration-300 group hover:bg-white/5 rounded-full"
+      >
+        <span className="text-xs font-semibold uppercase tracking-widest text-neutral-400 group-hover:text-white transition-colors">Install & Automation</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-neutral-500 group-hover:text-white transition-colors">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </button>
+
+      {isOpen && mounted && createPortal(modalContent, document.body)}
+    </>
   );
 }

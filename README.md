@@ -1,7 +1,7 @@
-# Remainders
+# <img src="public/logo.png" width="35" align="center" /> Remainders   
 
-<img align="right" height="200" src="/public/LogoBig.png" alt="Remainders-Logo"> 
-
+ <img  align="right" src="public/Year.webp" alt="Year View" width="25%" />
+ 
 **Memento Mori.** Remember you must die. Your daily reminder to live intentionally.
 
 Visualize your life progress or year at a glance. Generate beautiful, time-aware wallpapers that update automatically on your phone lock screen.
@@ -17,11 +17,10 @@ Visualize your life progress or year at a glance. Generate beautiful, time-aware
 - **Edge Runtime** - Fast wallpaper generation using Vercel OG
 - And much more...
 
-<p align="center">
-  <img src="public/Year.webp" alt="Year View" width="45%" />
-  &nbsp;&nbsp;
-  <img src="public/Life.webp" alt="Life View" width="45%" />
-</p>
+
+ 
+ 
+
 
 
 ---

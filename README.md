@@ -23,21 +23,6 @@ Visualize your life progress or year at a glance. Generate beautiful, time-aware
   <img src="public/Life.webp" alt="Life View" width="45%" />
 </p>
 
-## Tech Stack
-
-- **Framework**: Next.js 16 (Turbopack)
-- **Styling**: Tailwind CSS
-- **Generation**: Vercel OG Image (Edge Runtime)
-- **Deployment**: Vercel
-
-## Running Locally
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the application.
 
 ---
 

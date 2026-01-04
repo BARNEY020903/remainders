@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chronos",
-  description: "Minimalist wallpapers for mindful living.",
+  title: "Reminders",
+  description: "Memento Mori. Remember you must die. Live intentionally.",
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-touch-icon.png',

@@ -1,5 +1,5 @@
 /**
- * Calculation Functions for Chronos
+ * Calculation Functions for Reminders
  * 
  * This module contains pure math functions for calculating life progress metrics.
  * All functions are well-documented with JSDoc comments explaining the math behind them.

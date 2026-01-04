@@ -1,5 +1,5 @@
 /**
- * Chronos - Main Page Component
+ * Reminders - Main Page Component
  * Minimalist Redesign
  */
 
@@ -12,7 +12,7 @@ import BirthDateInput from '@/components/BirthDateInput';
 import ViewModeToggle from '@/components/ViewModeToggle';
 import SetupInstructions from '@/components/SetupInstructions';
 
-const STORAGE_KEY = 'chronos-user-profile';
+const STORAGE_KEY = 'reminders-user-profile';
 const THEME_COLOR = 'FFFFFF'; // White for minimalist dark theme
 
 export default function Home() {
@@ -109,7 +109,7 @@ export default function Home() {
         {/* Header */}
         <header className="text-center space-y-2 flex flex-col items-center">
           <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-light tracking-widest text-white uppercase">Chronos</h1>
+            <h1 className="text-3xl font-light tracking-widest text-white uppercase">Reminders</h1>
             <a
               href="https://github.com/Ti-03/Chronos"
               target="_blank"

@@ -1,8 +1,8 @@
-# Chronos
+# Reminders
 
-<img align="right" height="200" src="/public/logo.png" alt="Chronos-Logo"> 
+<img align="right" height="200" src="/public/logo.png" alt="Reminders-Logo"> 
 
-**Memento Mori.** Minimalist wallpapers for mindful living.
+**Memento Mori.** Remember you must die. Your daily reminder to live intentionally.
 
 Visualize your life progress or year at a glance. Generate beautiful, time-aware wallpapers that update automatically on your phone lock screen.
 

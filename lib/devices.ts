@@ -1,5 +1,5 @@
 /**
- * Device Database for Chronos
+ * Device Database for Reminders
  * 
  * This file contains a comprehensive list of popular smartphone models with their
  * exact screen resolutions. These dimensions are used to generate wallpapers that

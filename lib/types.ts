@@ -1,5 +1,5 @@
 /**
- * Core TypeScript types for Chronos wallpaper generator
+ * Core TypeScript types for Reminders wallpaper generator
  * 
  * This file defines all shared interfaces and types used throughout the application.
  * Keeping types in a central location ensures consistency and makes the codebase

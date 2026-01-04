@@ -1,6 +1,6 @@
 # <img src="public/logo.png" width="35" align="center" /> Remainders   
 
- <img  align="right" src="public/Year.webp" alt="Year View" width="25%" />
+ <img  align="right" src="public/Year.webp" alt="Year View" width="23%" />
  
 **Memento Mori.** Remember you must die. Your daily reminder to live intentionally.
 
@@ -25,5 +25,4 @@ Visualize your life progress or year at a glance. Generate beautiful, time-aware
 
 ---
 
-**Got questions or ideas?** We'd love to hear them! Feel free to open an issue or get in touch.  
-**Want to help?** Contributions are welcome! Please open an issue first to discuss what you'd like to change.
+**Got questions or ideas?** We'd love to hear them! Feel free to open an issue or get in touch.  **Want to help?** Contributions are welcome! Please open an issue first to discuss what you'd like to change.

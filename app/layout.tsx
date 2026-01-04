@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Reminders",
+  title: "Remainders",
   description: "Memento Mori. Remember you must die. Live intentionally.",
   icons: {
     icon: '/favicon.ico',

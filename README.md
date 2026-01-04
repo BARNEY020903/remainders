@@ -1,6 +1,6 @@
-# Reminders
+# Remainders
 
-<img align="right" height="200" src="/public/logo.png" alt="Reminders-Logo"> 
+<img align="right" height="200" src="/public/logoBig.png" alt="Remainders-Logo"> 
 
 **Memento Mori.** Remember you must die. Your daily reminder to live intentionally.
 

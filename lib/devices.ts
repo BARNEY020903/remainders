@@ -1,5 +1,5 @@
 /**
- * Device Database for Reminders
+ * Device Database for Remainders
  * 
  * This file contains a comprehensive list of popular smartphone models with their
  * exact screen resolutions. These dimensions are used to generate wallpapers that

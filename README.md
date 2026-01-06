@@ -1,6 +1,6 @@
 # <img src="public/logo.png" width="35" align="center" /> Remainders
 
-<img align="right" src="public/Year.webp" alt="Year View" width="25%" />
+<img align="right" src="public/Year.webp" alt="Year View" width="32%" />
 
 **Memento Mori.** Your daily reminder to live intentionally. Generate time-aware wallpapers for your phone lock screen.
 

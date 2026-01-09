@@ -205,22 +205,33 @@ service cloud.firestore {
 
 ```
 app/
-├── api/wallpaper/         # Wallpaper generation API
-│   ├── route.tsx          # Main API endpoint
-│   ├── year-view.tsx      # Year view renderer
-│   └── life-view.tsx      # Life view renderer
+├── api/                   # API routes
+│   ├── wallpaper/         # Wallpaper generation API
+│   ├── [username]/        # User profile API
+│   └── plugin-source/     # Plugin data API
+├── dashboard/             # User dashboard
+├── plugins/               # Plugin management
 ├── layout.tsx             # Root layout
 └── page.tsx               # Home page
 components/                # React components
+├── AuthButton.tsx         # Authentication UI
 ├── BirthDateInput.tsx     # Birth date picker
 ├── DeviceSelector.tsx     # Device selection UI
+├── PluginMarketplace.tsx  # Plugin marketplace
+├── TextElementsEditor.tsx # Text customization
 ├── ThemeColorPicker.tsx   # Color theme picker
 ├── ViewModeToggle.tsx     # Year/Life view toggle
 └── SetupInstructions.tsx  # Setup guide
 lib/
+├── auth-context.tsx       # Authentication context
 ├── calcs.ts               # Date/time calculations
 ├── devices.ts             # Device presets
-└── types.ts               # TypeScript types
+├── firebase.ts            # Firebase client config
+├── firebase-server.ts     # Firebase server config
+├── plugin-system.ts       # Plugin infrastructure
+├── themes.ts              # Theme definitions
+├── types.ts               # TypeScript types
+└── plugins/               # Built-in plugins
 ```
 
 ## 💡 How to Contribute

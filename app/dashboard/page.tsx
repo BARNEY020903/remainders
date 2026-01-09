@@ -675,7 +675,6 @@ export default function DashboardPage() {
           {/* Birth Date (only for life view) */}
           {viewMode === 'life' && (
             <div className="space-y-2">
-              <label className="text-xs uppercase tracking-widest text-neutral-500">Birth Date</label>
               <BirthDateInput value={birthDate} onChange={setBirthDate} />
             </div>
           )}
@@ -1080,21 +1079,6 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between">
             <h2 className="text-sm uppercase tracking-wider text-neutral-400">Plugins</h2>
             <div className="flex gap-2">
-              <button
-                onClick={async () => {
-                  try {
-                    await seedExamplePlugins();
-                    setSaveMessage('✓ Example plugins seeded!');
-                    setTimeout(() => setSaveMessage(''), 2000);
-                  } catch (error: any) {
-                    setSaveMessage('✗ Error: ' + (error?.message || 'Failed to seed plugins'));
-                    setTimeout(() => setSaveMessage(''), 3000);
-                  }
-                }}
-                className="text-xs text-neutral-500 hover:text-white transition-colors uppercase tracking-widest"
-              >
-                Seed Examples
-              </button>
               <a
                 href="/plugins/editor"
                 target="_blank"

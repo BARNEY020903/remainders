@@ -146,10 +146,11 @@ export default function Home() {
             </a>
           </div>
           <p className="text-sm text-neutral-500 font-mono tracking-wide">MEMENTO MORI</p>
+          <p className="sr-only">Generate life calendar and year calendar wallpapers. Visualize your life as 4,160 weeks for mindful, intentional living.</p>
         </header>
 
         {/* Configuration */}
-        <div className="space-y-8 w-full">
+        <section className="space-y-8 w-full" aria-label="Wallpaper Configuration">
           <ViewModeToggle selectedMode={viewMode} onChange={setViewMode} />
 
           <div className="space-y-6">
@@ -173,14 +174,15 @@ export default function Home() {
                 : 'bg-neutral-900 text-neutral-600 cursor-not-allowed'
               }
             `}
+            aria-label="Generate wallpaper URL"
           >
             Generate
           </button>
-        </div>
+        </section>
 
         {/* Result Area */}
         {wallpaperUrl && (
-          <div className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <section className="w-full space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500" aria-label="Generated Wallpaper">
             <div className="flex items-center gap-2 p-4 border border-white/10 bg-white/5 rounded backdrop-blur-sm">
               <code className="text-xs text-neutral-400 truncate flex-1 font-mono">
                 {wallpaperUrl}
@@ -188,6 +190,7 @@ export default function Home() {
               <button
                 onClick={copyToClipboard}
                 className="text-xs text-white hover:text-neutral-300 uppercase tracking-wider"
+                aria-label="Copy wallpaper URL to clipboard"
               >
                 {copied ? 'Copied' : 'Copy'}
               </button>
@@ -199,13 +202,14 @@ export default function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-neutral-500 hover:text-white transition-colors border-b border-transparent hover:border-white pb-0.5"
+                aria-label="Open wallpaper preview in new tab"
               >
                 Preview Wallpaper
               </a>
             </div>
 
             <SetupInstructions wallpaperUrl={wallpaperUrl} selectedBrand={selectedDevice?.brand || ''} />
-          </div>
+          </section>
         )}
       </div>
 

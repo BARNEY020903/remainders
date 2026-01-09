@@ -30,19 +30,30 @@ export function YearView({ width, height, isMondayFirst }: YearViewProps) {
     const COLUMNS = 3;
     const ROWS = 4;
 
-    // --- Layout Calculations ---
-    // 1. Safe Zones
-    const SAFE_AREA_TOP = height * 0.25;
+    // --- Layout Calculations with Aspect Ratio Support ---
+    // Calculate aspect ratio to adapt layout
+    const aspectRatio = height / width;
+    
+    // 1. Safe Zones - adapt based on aspect ratio
+    // Taller phones (>2.0) need more top padding
+    const SAFE_AREA_TOP = aspectRatio > 2.0 ? height * 0.28 : height * 0.25;
     const SAFE_AREA_BOTTOM = height * 0.15;
     const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
 
-    // 2. Horizontal Spacing
-    const paddingX = width * 0.18;
+    // 2. Horizontal Spacing - reduce padding on narrower screens
+    const basePaddingRatio = aspectRatio > 2.1 ? 0.12 : aspectRatio > 2.0 ? 0.15 : 0.18;
+    const paddingX = width * basePaddingRatio;
     const availableWidth = width - (paddingX * 2);
     const cellWidth = availableWidth / COLUMNS;
 
-    // 3. Size Config
-    const dotSize = Math.min(cellWidth / 7, 20);
+    // 3. Size Config - scale based on available space
+    // Calculate maximum dot size that fits horizontally
+    const maxDotSizeH = cellWidth / 8; // 7 dots + spacing
+    // Calculate maximum dot size that fits vertically
+    const maxMonthBlockHeight = SAFE_HEIGHT / ROWS;
+    const maxDotSizeV = maxMonthBlockHeight / 9; // Labels + 6 rows of dots + gaps
+    
+    const dotSize = Math.min(maxDotSizeH, maxDotSizeV, 20);
     const dotGap = dotSize * 0.7;
     const monthLabelSize = dotSize * 1.6;
 
@@ -52,13 +63,14 @@ export function YearView({ width, height, isMondayFirst }: YearViewProps) {
 
     // Stats Text Config
     const statsFontSize = monthLabelSize;
-    const statsMargin = rowGap * 4.0;
+    const statsMargin = rowGap * 3.0; // Reduced from 4.0 for tighter spacing
 
     const gridHeight = (ROWS * monthBlockHeight) + ((ROWS - 1) * rowGap);
     const totalContentHeight = gridHeight + statsMargin + statsFontSize;
 
-    // 5. Centering
-    const startY = SAFE_AREA_TOP + ((SAFE_HEIGHT - totalContentHeight) / 2);
+    // 5. Centering with bounds checking
+    const calculatedStartY = SAFE_AREA_TOP + ((SAFE_HEIGHT - totalContentHeight) / 2);
+    const startY = Math.max(SAFE_AREA_TOP * 0.9, calculatedStartY); // Ensure minimum top margin
     const statsY = startY + gridHeight + statsMargin;
 
     // Helper to get days in month
@@ -126,13 +138,17 @@ export function YearView({ width, height, isMondayFirst }: YearViewProps) {
 
         const x = paddingX + (colIndex * cellWidth);
         const y = startY + (rowIndex * (monthBlockHeight + rowGap));
+        
+        // Center dot grid within cell
+        const dotGridWidth = (7 * dotSize) + (6 * dotGap);
+        const centerOffset = Math.max(0, (cellWidth - dotGridWidth) / 2);
 
         return (
             <div
                 key={monthName}
                 style={{
                     position: 'absolute',
-                    left: x + (cellWidth - (7 * (dotSize + dotGap))) / 2, // Center in cell
+                    left: x + centerOffset,
                     top: y,
                     display: 'flex',
                     flexDirection: 'column',

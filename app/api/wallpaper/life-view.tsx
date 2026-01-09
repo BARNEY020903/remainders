@@ -27,11 +27,16 @@ export function LifeView({ width, height, birthDate }: LifeViewProps) {
 
     const lifePercentage = ((weeksLived / TOTAL_DOTS) * 100).toFixed(1);
 
-    // Layout Calculations
-    // We want a big rectangular block of dots.
-    const SAFE_AREA_TOP = height * 0.25; // Reserve top 25% for device UI
+    // Layout Calculations with Aspect Ratio Support
+    const aspectRatio = height / width;
+    
+    // Adapt safe zones based on aspect ratio - taller phones need more top padding
+    const SAFE_AREA_TOP = aspectRatio > 2.0 ? height * 0.28 : height * 0.25;
     const SAFE_AREA_BOTTOM = height * 0.14;
-    const SAFE_WIDTH_PADDING = width * 0.10; // 10% padding on sides
+    
+    // Reduce side padding on narrower screens
+    const sidePaddingRatio = aspectRatio > 2.1 ? 0.08 : aspectRatio > 2.0 ? 0.09 : 0.10;
+    const SAFE_WIDTH_PADDING = width * sidePaddingRatio;
 
     const availableWidth = width - (SAFE_WIDTH_PADDING * 2);
     const availableHeight = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
@@ -41,34 +46,35 @@ export function LifeView({ width, height, birthDate }: LifeViewProps) {
     // Aspect Ratio of container
     const outputRatio = availableWidth / availableHeight;
 
-    // Ideally, (cols * unit) / (rows * unit) approx outputRatio
-    // cols / rows approx outputRatio
-    // rows = cols / outputRatio
+    // Calculate optimal columns based on aspect ratio
+    // cols / rows ≈ outputRatio
+    // cols * rows = TOTAL_DOTS
     // cols * (cols / outputRatio) = TOTAL_DOTS
     // cols^2 = TOTAL_DOTS * outputRatio
-    // cols = sqrt(TOTAL_DOTS * outputRatio)
-
     const estimatedCols = Math.sqrt(TOTAL_DOTS * outputRatio);
-    const cols = Math.floor(estimatedCols);
+    const cols = Math.max(40, Math.floor(estimatedCols)); // Minimum 40 columns
     const rows = Math.ceil(TOTAL_DOTS / cols);
 
-    // Now calculate dot size
-    // width = cols * dotSize + (cols-1) * gap
-    // Let gap = dotSize * 0.4 (small gap)
-    // width = cols * s + (cols-1)*0.4*s = s * (cols + 0.4cols - 0.4) = s * (1.4cols - 0.4)
-    // s = width / (1.4cols - 0.4)
-
+    // Now calculate dot size with proper gap ratio
     const gapRatio = 0.4;
-    const dotSize = Math.floor(availableWidth / (cols + (cols - 1) * gapRatio));
+    
+    // Calculate based on width constraint
+    const dotSizeFromWidth = availableWidth / (cols + (cols - 1) * gapRatio);
+    // Calculate based on height constraint  
+    const dotSizeFromHeight = availableHeight / (rows + (rows - 1) * gapRatio);
+    
+    // Use the smaller value to ensure it fits
+    const dotSize = Math.floor(Math.min(dotSizeFromWidth, dotSizeFromHeight));
     const gap = Math.max(1, Math.floor(dotSize * gapRatio)); // At least 1px gap
 
     // Recalculate actual dimensions
     const gridWidth = (cols * dotSize) + ((cols - 1) * gap);
     const gridHeight = (rows * dotSize) + ((rows - 1) * gap);
 
-    // Center the grid
-    const startX = (width - gridWidth) / 2;
-    const startY = SAFE_AREA_TOP + (availableHeight - gridHeight) / 2;
+    // Center the grid with bounds checking
+    const startX = Math.max(SAFE_WIDTH_PADDING, (width - gridWidth) / 2);
+    const calculatedStartY = SAFE_AREA_TOP + (availableHeight - gridHeight) / 2;
+    const startY = Math.max(SAFE_AREA_TOP * 0.9, calculatedStartY); // Ensure minimum top margin
 
     // Generate SVG circles for optimized rendering
     const pastCircles = [];

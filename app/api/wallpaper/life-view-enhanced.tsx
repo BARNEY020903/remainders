@@ -72,10 +72,22 @@ export default function LifeView({
   const weeksLived = Math.min(Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7)), TOTAL_DOTS);
   const lifePercentage = ((weeksLived / TOTAL_DOTS) * 100).toFixed(1);
 
-  // Layout Calculations
-  const SAFE_AREA_TOP = height * layout.topPadding;
+  // Layout Calculations with Aspect Ratio Support
+  const aspectRatio = height / width;
+  
+  // Adapt safe zones based on aspect ratio
+  const SAFE_AREA_TOP = aspectRatio > 2.0 
+    ? height * Math.max(layout.topPadding, 0.28) 
+    : height * layout.topPadding;
   const SAFE_AREA_BOTTOM = height * layout.bottomPadding;
-  const SAFE_WIDTH_PADDING = width * layout.sidePadding;
+  
+  // Reduce side padding on narrower screens
+  const adjustedSidePadding = aspectRatio > 2.1 
+    ? Math.min(layout.sidePadding, 0.08) 
+    : aspectRatio > 2.0 
+    ? Math.min(layout.sidePadding, 0.09) 
+    : layout.sidePadding;
+  const SAFE_WIDTH_PADDING = width * adjustedSidePadding;
 
   const availableWidth = width - SAFE_WIDTH_PADDING * 2;
   const availableHeight = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
@@ -83,20 +95,23 @@ export default function LifeView({
   // Calculate optimal grid dimensions
   const outputRatio = availableWidth / availableHeight;
   const estimatedCols = Math.sqrt(TOTAL_DOTS * outputRatio);
-  const cols = Math.floor(estimatedCols);
+  const cols = Math.max(40, Math.floor(estimatedCols)); // Minimum 40 columns
   const rows = Math.ceil(TOTAL_DOTS / cols);
 
-  // Calculate dot size with spacing
-  const dotSize = Math.floor(availableWidth / (cols + (cols - 1) * layout.dotSpacing));
+  // Calculate dot size with spacing - ensure it fits both dimensions
+  const dotSizeFromWidth = availableWidth / (cols + (cols - 1) * layout.dotSpacing);
+  const dotSizeFromHeight = availableHeight / (rows + (rows - 1) * layout.dotSpacing);
+  const dotSize = Math.floor(Math.min(dotSizeFromWidth, dotSizeFromHeight));
   const gap = Math.max(1, Math.floor(dotSize * layout.dotSpacing));
 
   // Grid dimensions
   const gridWidth = cols * dotSize + (cols - 1) * gap;
   const gridHeight = rows * dotSize + (rows - 1) * gap;
 
-  // Center the grid
-  const startX = (width - gridWidth) / 2;
-  const startY = SAFE_AREA_TOP + (availableHeight - gridHeight) / 2;
+  // Center the grid with bounds checking
+  const startX = Math.max(SAFE_WIDTH_PADDING, (width - gridWidth) / 2);
+  const calculatedStartY = SAFE_AREA_TOP + (availableHeight - gridHeight) / 2;
+  const startY = Math.max(SAFE_AREA_TOP * 0.9, calculatedStartY);
 
   // Generate dots
   const pastCircles = [];

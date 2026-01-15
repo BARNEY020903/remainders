@@ -277,7 +277,7 @@ export async function getAvailablePlugins(userId?: string) {
     const plugins = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    })).filter(plugin => {
+    } as any)).filter((plugin: any) => {
       // Show all public plugins
       if (!plugin.isPrivate) return true;
       // Show private plugins only to their author

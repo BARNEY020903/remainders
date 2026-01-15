@@ -114,12 +114,13 @@ export default function PluginEditorPage() {
   const [showSubmitForm, setShowSubmitForm] = useState(false);
 
   useEffect(() => {
-    loadBuiltInPlugins();
-    loadUserPlugins();
+    loadPlugins();
   }, [user]);
 
-  const loadBuiltInPlugins = async () => {
+  const loadPlugins = async () => {
+    setLoadingPlugins(true);
     try {
+      // Load built-in plugins with source code
       const builtInWithSource = await Promise.all(
         BUILTIN_PLUGINS.map(async (plugin) => {
           try {
@@ -137,41 +138,37 @@ export default function PluginEditorPage() {
           }
         })
       );
-      
-      setPlugins(builtInWithSource);
+
+      // Load user plugins
+      let userPlugins: Plugin[] = [];
+      if (user && db) {
+        try {
+          const pluginsSnapshot = await getDocs(collection(db, 'plugins'));
+          userPlugins = pluginsSnapshot.docs
+            .filter(doc => doc.data().authorId === user.uid)
+            .map(doc => ({
+              id: doc.id,
+              name: doc.data().name,
+              description: doc.data().description,
+              source: doc.data().code,
+              isBuiltIn: false,
+              author: doc.data().author,
+              version: doc.data().version,
+              configSchema: doc.data().configSchema,
+              defaultSettings: doc.data().defaultSettings,
+              isPrivate: doc.data().isPrivate || false,
+            }));
+        } catch (err: any) {
+          console.error('Error loading user plugins:', err);
+        }
+      }
+
+      // Set all plugins at once
+      setPlugins([...builtInWithSource, ...userPlugins]);
       setLoadingPlugins(false);
     } catch (err) {
-      console.error('Error loading built-in plugins:', err);
-      setLoadingPlugins(false);
-    }
-  };
-
-  const loadUserPlugins = async () => {
-    if (!user || !db) return;
-
-    try {
-      const pluginsSnapshot = await getDocs(collection(db, 'plugins'));
-      const userPlugins: Plugin[] = pluginsSnapshot.docs
-        .filter(doc => doc.data().authorId === user.uid)
-        .map(doc => ({
-          id: doc.id,
-          name: doc.data().name,
-          description: doc.data().description,
-          source: doc.data().code,
-          isBuiltIn: false,
-          author: doc.data().author,
-          version: doc.data().version,
-          configSchema: doc.data().configSchema,
-          defaultSettings: doc.data().defaultSettings,
-          isPrivate: doc.data().isPrivate || false,
-        }));
-
-      setPlugins(prev => {
-        const builtIn = prev.filter(p => p.isBuiltIn);
-        return [...builtIn, ...userPlugins];
-      });
-    } catch (err: any) {
       console.error('Error loading plugins:', err);
+      setLoadingPlugins(false);
     }
   };
 

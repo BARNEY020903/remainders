@@ -23,7 +23,7 @@ function PluginSubmissionForm() {
   const [code, setCode] = useState('');
   const [configSchema, setConfigSchema] = useState('{}');
   const [defaultSettings, setDefaultSettings] = useState('{}');
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);

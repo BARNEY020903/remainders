@@ -95,8 +95,8 @@ export default function YearView({
     const paddingX = width * adjustedSidePadding;
     const availableWidth = width - paddingX * 2;
     
-    // Calculate grid dimensions - bigger dots
-    const COLS_PER_ROW = Math.floor(Math.sqrt(totalDays * (availableWidth / SAFE_HEIGHT)));
+    // Calculate grid dimensions - fixed 14 days per row
+    const COLS_PER_ROW = 14;
     const ROWS = Math.ceil(totalDays / COLS_PER_ROW);
     
     // Calculate dot size

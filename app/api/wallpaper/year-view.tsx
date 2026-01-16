@@ -38,8 +38,8 @@ export function YearView({ width, height, isMondayFirst, yearViewLayout = 'month
         const paddingX = width * basePaddingRatio;
         const availableWidth = width - paddingX * 2;
         
-        // Calculate grid dimensions - smaller dots
-        const COLS_PER_ROW = Math.floor(Math.sqrt(totalDays * (availableWidth / SAFE_HEIGHT)));
+        // Calculate grid dimensions - fixed 14 days per row
+        const COLS_PER_ROW = 14;
         const ROWS = Math.ceil(totalDays / COLS_PER_ROW);
         
         const maxDotSizeH = availableWidth / COLS_PER_ROW;

@@ -21,6 +21,7 @@ export default function Home() {
   const [selectedDevice, setSelectedDevice] = useState<DeviceModel | null>(null);
   const [viewMode, setViewMode] = useState<'year' | 'life'>('life');
   const [isMondayFirst, setIsMondayFirst] = useState(false);
+  const [yearViewLayout, setYearViewLayout] = useState<'months' | 'days'>('months');
   const [wallpaperUrl, setWallpaperUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -34,6 +35,7 @@ export default function Home() {
         setBirthDate(profile.birthDate);
         if (profile.viewMode) setViewMode(profile.viewMode);
         if (profile.isMondayFirst !== undefined) setIsMondayFirst(profile.isMondayFirst);
+        if ((profile as any).yearViewLayout) setYearViewLayout((profile as any).yearViewLayout);
 
         if (profile.device) {
           setSelectedDevice({
@@ -53,7 +55,7 @@ export default function Home() {
     if (typeof window === 'undefined') return;
     
     if (birthDate && selectedDevice) {
-      const profile: UserProfile = {
+      const profile: any = {
         birthDate,
         themeColor: THEME_COLOR,
         device: {
@@ -64,6 +66,7 @@ export default function Home() {
         },
         viewMode,
         isMondayFirst,
+        yearViewLayout,
       };
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
@@ -89,8 +92,11 @@ export default function Home() {
       params.append('birthDate', birthDate);
     }
     
-    if (viewMode === 'year' && isMondayFirst) {
-      params.append('isMondayFirst', 'true');
+    if (viewMode === 'year') {
+      if (isMondayFirst) {
+        params.append('isMondayFirst', 'true');
+      }
+      params.append('yearViewLayout', yearViewLayout);
     }
 
     const baseUrl = typeof window !== 'undefined'
@@ -106,7 +112,7 @@ export default function Home() {
     if (isFormComplete && !wallpaperUrl) {
       generateWallpaperUrl();
     }
-  }, [selectedDevice, birthDate, viewMode, isMondayFirst]);
+  }, [selectedDevice, birthDate, viewMode, isMondayFirst, yearViewLayout]);
 
   const copyToClipboard = async () => {
     try {
@@ -162,18 +168,49 @@ export default function Home() {
           
           {/* Monday First Toggle (only for year view) */}
           {viewMode === 'year' && (
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="mondayFirst"
-                checked={isMondayFirst}
-                onChange={(e) => setIsMondayFirst(e.target.checked)}
-                className="w-5 h-5 rounded cursor-pointer border-2 border-white/30 bg-black/50 checked:bg-white checked:border-white appearance-none relative checked:after:content-['✓'] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:text-black checked:after:text-sm checked:after:font-bold"
-              />
-              <label htmlFor="mondayFirst" className="text-xs uppercase tracking-widest text-neutral-500 cursor-pointer">
-                Start week on Monday
-              </label>
-            </div>
+            <>
+              {/* Year View Layout Toggle */}
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-neutral-500">Layout</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setYearViewLayout('months')}
+                    className={`flex-1 py-3 text-xs uppercase tracking-widest transition-colors ${
+                      yearViewLayout === 'months'
+                        ? 'bg-white text-black'
+                        : 'bg-neutral-900 text-neutral-500 hover:bg-neutral-800'
+                    }`}
+                  >
+                    Months
+                  </button>
+                  <button
+                    onClick={() => setYearViewLayout('days')}
+                    className={`flex-1 py-3 text-xs uppercase tracking-widest transition-colors ${
+                      yearViewLayout === 'days'
+                        ? 'bg-white text-black'
+                        : 'bg-neutral-900 text-neutral-500 hover:bg-neutral-800'
+                    }`}
+                  >
+                    Days
+                  </button>
+                </div>
+              </div>
+
+              {yearViewLayout === 'months' && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="mondayFirst"
+                    checked={isMondayFirst}
+                    onChange={(e) => setIsMondayFirst(e.target.checked)}
+                    className="w-5 h-5 rounded cursor-pointer border-2 border-white/30 bg-black/50 checked:bg-white checked:border-white appearance-none relative checked:after:content-['✓'] checked:after:absolute checked:after:left-1/2 checked:after:top-1/2 checked:after:-translate-x-1/2 checked:after:-translate-y-1/2 checked:after:text-black checked:after:text-sm checked:after:font-bold"
+                  />
+                  <label htmlFor="mondayFirst" className="text-xs uppercase tracking-widest text-neutral-500 cursor-pointer">
+                    Start week on Monday
+                  </label>
+                </div>
+              )}
+            </>
           )}
 
           <div className="space-y-6">

@@ -8,9 +8,10 @@ interface YearViewProps {
     width: number;
     height: number;
     isMondayFirst: boolean;
+    yearViewLayout?: 'months' | 'days';
 }
 
-export function YearView({ width, height, isMondayFirst }: YearViewProps) {
+export function YearView({ width, height, isMondayFirst, yearViewLayout = 'months' }: YearViewProps) {
     // Colors Config
     const BG_COLOR = '#1a1a1a'; // Dark background
     const TEXT_COLOR = '#888888'; // Grey for text
@@ -25,7 +26,105 @@ export function YearView({ width, height, isMondayFirst }: YearViewProps) {
     const daysLeft = calculateDaysLeftInYear();
     const totalDays = getTotalDaysInCurrentYear();
 
-    // Grid Layout Config
+    // Days View Layout (continuous rectangle grid)
+    if (yearViewLayout === 'days') {
+        const aspectRatio = height / width;
+        
+        const SAFE_AREA_TOP = aspectRatio > 2.0 ? height * 0.28 : height * 0.25;
+        const SAFE_AREA_BOTTOM = height * 0.15;
+        const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
+        
+        const basePaddingRatio = aspectRatio > 2.1 ? 0.12 : aspectRatio > 2.0 ? 0.15 : 0.18;
+        const paddingX = width * basePaddingRatio;
+        const availableWidth = width - paddingX * 2;
+        
+        // Calculate grid dimensions - smaller dots
+        const COLS_PER_ROW = Math.floor(Math.sqrt(totalDays * (availableWidth / SAFE_HEIGHT)));
+        const ROWS = Math.ceil(totalDays / COLS_PER_ROW);
+        
+        const maxDotSizeH = availableWidth / COLS_PER_ROW;
+        const maxDotSizeV = SAFE_HEIGHT / (ROWS + 2);
+        const dotSize = Math.min(maxDotSizeH, maxDotSizeV) * 0.7;
+        const dotGap = dotSize * 0.35;
+        
+        const statsFontSize = dotSize * 0.8;
+        const statsMargin = dotSize * 2;
+        
+        const gridWidth = COLS_PER_ROW * (dotSize + dotGap) - dotGap;
+        const gridHeight = ROWS * (dotSize + dotGap) - dotGap;
+        
+        const startX = paddingX + (availableWidth - gridWidth) / 2;
+        const startY = SAFE_AREA_TOP + (SAFE_HEIGHT - gridHeight - statsMargin - statsFontSize) / 2;
+        const statsY = startY + gridHeight + statsMargin;
+        
+        // Create all dots
+        const allDots = [];
+        for (let day = 1; day <= totalDays; day++) {
+            let color;
+            if (day < currentDayOfYear) {
+                color = PAST_COLOR;
+            } else if (day === currentDayOfYear) {
+                color = ACCENT_COLOR;
+            } else {
+                color = FUTURE_COLOR;
+            }
+            
+            const row = Math.floor((day - 1) / COLS_PER_ROW);
+            const col = (day - 1) % COLS_PER_ROW;
+            
+            allDots.push(
+                <div
+                    key={`dot-${day}`}
+                    style={{
+                        position: 'absolute',
+                        left: startX + col * (dotSize + dotGap),
+                        top: startY + row * (dotSize + dotGap),
+                        width: dotSize,
+                        height: dotSize,
+                        borderRadius: '50%',
+                        backgroundColor: color,
+                    }}
+                />
+            );
+        }
+        
+        return (
+            <div
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: BG_COLOR,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                }}
+            >
+                <div style={{ display: 'flex', position: 'relative', width: '100%', height: '100%' }}>
+                    {allDots}
+                </div>
+
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: statsY,
+                        left: 0,
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        fontSize: statsFontSize,
+                        fontFamily: 'monospace',
+                    }}
+                >
+                    <span style={{ color: ACCENT_COLOR }}>{daysLeft}d left</span>
+                    <span style={{ color: TEXT_COLOR, margin: '0 8px' }}>·</span>
+                    <span style={{ color: TEXT_COLOR }}>{Math.round((currentDayOfYear / totalDays) * 100)}%</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Grid Layout Config (Months View)
     const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const COLUMNS = 3;
     const ROWS = 4;

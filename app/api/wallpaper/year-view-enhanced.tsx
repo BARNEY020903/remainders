@@ -16,6 +16,7 @@ interface YearViewProps {
   width: number;
   height: number;
   isMondayFirst: boolean;
+  yearViewLayout?: 'months' | 'days';
   colors?: {
     background: string;
     past: string;
@@ -44,6 +45,7 @@ export default function YearView({
   width,
   height,
   isMondayFirst,
+  yearViewLayout = 'months',
   colors = {
     background: '#1a1a1a',
     past: '#FFFFFF',
@@ -74,7 +76,180 @@ export default function YearView({
   const daysLeft = calculateDaysLeftInYear(timezone);
   const totalDays = getTotalDaysInCurrentYear();
 
-  // Grid Layout Config
+  // Days View Layout (continuous rectangle grid)
+  if (yearViewLayout === 'days') {
+    const aspectRatio = height / width;
+    
+    const SAFE_AREA_TOP = aspectRatio > 2.0 
+      ? height * Math.max(layout.topPadding, 0.28) 
+      : height * layout.topPadding;
+    const SAFE_AREA_BOTTOM = height * layout.bottomPadding;
+    const SAFE_HEIGHT = height - SAFE_AREA_TOP - SAFE_AREA_BOTTOM;
+    
+    const adjustedSidePadding = aspectRatio > 2.1 
+      ? Math.min(layout.sidePadding, 0.12) 
+      : aspectRatio > 2.0 
+      ? Math.min(layout.sidePadding, 0.15) 
+      : layout.sidePadding;
+    
+    const paddingX = width * adjustedSidePadding;
+    const availableWidth = width - paddingX * 2;
+    
+    // Calculate grid dimensions - bigger dots
+    const COLS_PER_ROW = Math.floor(Math.sqrt(totalDays * (availableWidth / SAFE_HEIGHT)));
+    const ROWS = Math.ceil(totalDays / COLS_PER_ROW);
+    
+    // Calculate dot size
+    const maxDotSizeH = availableWidth / COLS_PER_ROW;
+    const maxDotSizeV = SAFE_HEIGHT / (ROWS + 2); // +2 for stats spacing
+    const dotSize = Math.min(maxDotSizeH, maxDotSizeV) * 0.7; // Smaller dots
+    const dotGap = dotSize * layout.dotSpacing * 0.5; // Tighter spacing
+    
+    const statsFontSize = dotSize * 0.8; // Much smaller footer text
+    const statsMargin = dotSize * 2;
+    
+    const gridWidth = COLS_PER_ROW * (dotSize + dotGap) - dotGap;
+    const gridHeight = ROWS * (dotSize + dotGap) - dotGap;
+    
+    const startX = paddingX + (availableWidth - gridWidth) / 2;
+    const startY = SAFE_AREA_TOP + (SAFE_HEIGHT - gridHeight - statsMargin - statsFontSize) / 2;
+    const statsY = startY + gridHeight + statsMargin;
+    
+    // Create all dots
+    const allDots = [];
+    for (let day = 1; day <= totalDays; day++) {
+      let color;
+      if (day < currentDayOfYear) {
+        color = colors.past;
+      } else if (day === currentDayOfYear) {
+        color = colors.current;
+      } else {
+        color = colors.future;
+      }
+      
+      const row = Math.floor((day - 1) / COLS_PER_ROW);
+      const col = (day - 1) % COLS_PER_ROW;
+      
+      allDots.push(
+        <div
+          key={`dot-${day}`}
+          style={{
+            position: 'absolute',
+            left: `${startX + col * (dotSize + dotGap)}px`,
+            top: `${startY + row * (dotSize + dotGap)}px`,
+            width: `${dotSize}px`,
+            height: `${dotSize}px`,
+            borderRadius: '50%',
+            backgroundColor: color,
+          }}
+        />
+      );
+    }
+    
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: colors?.background || '#1a1a1a',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+      >
+        <div style={{ display: 'flex', position: 'relative', width: '100%', height: '100%' }}>
+          {allDots}
+        </div>
+
+        {/* Stats Footer */}
+        {typography.statsVisible && (
+          <div
+            style={{
+              position: 'absolute',
+              top: `${statsY}px`,
+              left: '0px',
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              fontSize: `${statsFontSize}px`,
+              fontFamily: typography?.fontFamily || 'monospace',
+            }}
+          >
+            <span style={{ color: colors?.current || '#FF6B35' }}>{daysLeft}d left</span>
+            <span style={{ color: colors?.text || '#888888', margin: '0px 8px' }}>·</span>
+            <span style={{ color: colors?.text || '#888888' }}>{Math.round((currentDayOfYear / totalDays) * 100)}%</span>
+          </div>
+        )}
+
+        {/* Custom Text Elements */}
+        {textElements.map((element) => {
+          if (!element.visible || element.content == null) return null;
+          
+          const style: any = {
+            position: 'absolute',
+            left: `${element.x}%`,
+            top: `${element.y}%`,
+            fontSize: `${element.fontSize || 16}px`,
+            fontFamily: element.fontFamily || typography?.fontFamily || 'monospace',
+            color: element.color || colors?.text || '#888888',
+          };
+
+          const align = element.align || 'left';
+          if (align === 'center') {
+            style.transform = 'translate(-50%, -50%)';
+          } else if (align === 'right') {
+            style.transform = 'translate(-100%, -50%)';
+          } else {
+            style.transform = 'translateY(-50%)';
+          }
+
+          return (
+            <div key={element.id} style={style}>
+              {String(element.content).trim()}
+            </div>
+          );
+        })}
+
+        {/* Plugin-added Elements */}
+        {pluginElements.map((element, index) => {
+          if (element.type === 'text' && element.content != null) {
+            const contentStr = String(element.content || '').trim();
+            
+            if (!contentStr) return null;
+
+            const style: any = {
+              position: 'absolute',
+              left: `${element.x}px`,
+              top: `${element.y}px`,
+              fontSize: `${element.fontSize || 16}px`,
+              color: element.color || colors?.text || '#888888',
+              fontFamily: element.fontFamily || typography?.fontFamily || 'monospace',
+            };
+
+            if (element.align === 'center') {
+              style.transform = 'translateX(-50%)';
+            } else if (element.align === 'right') {
+              style.transform = 'translateX(-100%)';
+            }
+
+            if (typeof element.maxWidth === 'number') {
+              style.maxWidth = `${element.maxWidth}px`;
+            }
+            
+            return (
+              <div key={`plugin-${index}`} style={style}>
+                {contentStr}
+              </div>
+            );
+          }
+          return null;
+        })}
+      </div>
+    );
+  }
+
+  // Grid Layout Config (Months View)
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const COLUMNS = 3;
   const ROWS = 4;

@@ -191,6 +191,9 @@ export interface UserConfig {
   /** Monday as first day of week (for year view) */
   isMondayFirst: boolean;
   
+  /** Year view layout type: 'months' (default) or 'days' */
+  yearViewLayout?: 'months' | 'days';
+  
   /** User's timezone (IANA format) */
   timezone?: string;
   

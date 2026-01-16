@@ -266,6 +266,7 @@ export async function GET(
       view = YearView({
         ...viewProps,
         isMondayFirst: config.isMondayFirst || false,
+        yearViewLayout: config.yearViewLayout || 'months',
         timezone: userTimezone,
       });
     }

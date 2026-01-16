@@ -36,6 +36,7 @@ export default function DashboardPage() {
   const [birthDate, setBirthDate] = useState('');
   const [selectedDevice, setSelectedDevice] = useState<DeviceModel | null>(null);
   const [isMondayFirst, setIsMondayFirst] = useState(false);
+  const [yearViewLayout, setYearViewLayout] = useState<'months' | 'days'>('months');
   
   // Customization state
   const [selectedTheme, setSelectedTheme] = useState<string>('Dark Default');
@@ -130,6 +131,7 @@ export default function DashboardPage() {
       viewMode,
       birthDate,
       isMondayFirst,
+      yearViewLayout,
       timezone,
       device: JSON.stringify(currentDevice),
     };
@@ -143,6 +145,7 @@ export default function DashboardPage() {
       viewMode: config.viewMode,
       birthDate: config.birthDate,
       isMondayFirst: config.isMondayFirst,
+      yearViewLayout: config.yearViewLayout,
       timezone: config.timezone,
       device: JSON.stringify(config.device),
     };
@@ -182,6 +185,7 @@ export default function DashboardPage() {
       setViewMode(cfg.viewMode || 'life');
       setBirthDate(cfg.birthDate || '');
       setIsMondayFirst(cfg.isMondayFirst || false);
+      setYearViewLayout(cfg.yearViewLayout || 'months');
       
       // Load customization settings
       if (cfg.colors) {
@@ -488,6 +492,7 @@ export default function DashboardPage() {
         textElements: [],
         plugins: [],
         isMondayFirst,
+        yearViewLayout,
         timezone: 'UTC',
         updatedAt: new Date(),
       };
@@ -523,6 +528,7 @@ export default function DashboardPage() {
       textElements: textElements,
       plugins: plugins,
       isMondayFirst,
+      yearViewLayout,
       timezone: timezone,
       updatedAt: new Date(),
     };
@@ -717,18 +723,54 @@ export default function DashboardPage() {
 
           {/* Monday First (only for year view) */}
           {viewMode === 'year' && (
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="mondayFirst"
-                checked={isMondayFirst}
-                onChange={(e) => setIsMondayFirst(e.target.checked)}
-                className="w-4 h-4"
-              />
-              <label htmlFor="mondayFirst" className="text-xs uppercase tracking-widest text-neutral-500">
-                Start week on Monday
-              </label>
-            </div>
+            <>
+              {/* Year View Layout Toggle */}
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-neutral-500">Year View Layout</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setYearViewLayout('months')}
+                    className={`flex-1 py-3 text-xs uppercase tracking-widest transition-colors ${
+                      yearViewLayout === 'months'
+                        ? 'bg-white text-black'
+                        : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'
+                    }`}
+                  >
+                    Months
+                  </button>
+                  <button
+                    onClick={() => setYearViewLayout('days')}
+                    className={`flex-1 py-3 text-xs uppercase tracking-widest transition-colors ${
+                      yearViewLayout === 'days'
+                        ? 'bg-white text-black'
+                        : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'
+                    }`}
+                  >
+                    Days
+                  </button>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  {yearViewLayout === 'months' 
+                    ? 'Display days organized by months' 
+                    : 'Display days as a continuous grid'}
+                </p>
+              </div>
+
+              {yearViewLayout === 'months' && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="mondayFirst"
+                    checked={isMondayFirst}
+                    onChange={(e) => setIsMondayFirst(e.target.checked)}
+                    className="w-4 h-4"
+                  />
+                  <label htmlFor="mondayFirst" className="text-xs uppercase tracking-widest text-neutral-500">
+                    Start week on Monday
+                  </label>
+                </div>
+              )}
+            </>
           )}
 
           {/* Timezone Selector */}

